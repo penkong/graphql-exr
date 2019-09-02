@@ -1,5 +1,6 @@
 {
-  "users": [{
+  "users": [
+    {
       "id": "43",
       "firstName": "bill",
       "age": "20",
@@ -7,7 +8,7 @@
     },
     {
       "id": "44",
-      "firstName": "sam",
+      "firstName": "robern",
       "age": "22",
       "companyId": "2"
     },
@@ -18,7 +19,8 @@
       "companyId": "2"
     }
   ],
-  "companies": [{
+  "companies": [
+    {
       "id": "1",
       "firstName": "apple",
       "description": "iphone"

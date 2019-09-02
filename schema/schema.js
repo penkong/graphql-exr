@@ -7,7 +7,8 @@ const {
   GraphQLString,
   GraphQLInt,
   GraphQLSchema,
-  GraphQLList
+  GraphQLList,
+  GraphQLNonNull
 } = graphql;
 
 const users = [
@@ -15,7 +16,9 @@ const users = [
   { id: '44', firstName: 'sam', age: 22},
 ]
 // every route has type 
+
 // company type must be on top of user type
+
 // because we are going associated company to user type.
 // we are going to do nested queries
 const CompanyType = new GraphQLObjectType({
@@ -41,7 +44,7 @@ const CompanyType = new GraphQLObjectType({
     users: {
       // because we get back many users we use this new obj from graphql
       type: new GraphQLList(UserType),
-      // parentValue is precedence => company
+      // parentValue is precedence check name => company
       resolve(parentValue, args){
         return axios
           // id of company that we currently considering
@@ -142,11 +145,92 @@ const RootQuery = new GraphQLObjectType({
   }
 })
 
+///   mutations do almost crud on graphql 
 
-
+// query    => root query => types
+// mutation => mutations => add/ delete user
+// define another obj like root for it
+// this is root mutation
+const mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    // name of mutation desc operation we are going to take
+    addUser: {
+      // type is type of data that eventually resolve() bring back.
+      // also it can be different from what you bring back from obj you iterate over it
+      type: UserType,
+      args: {
+        // for adding lvl of validation
+        firstName: { 
+          // assert there is value , value is passed
+          type: new GraphQLNonNull(GraphQLString) 
+        },
+        age: {
+          type: new GraphQLNonNull(GraphQLInt)
+        },
+        companyId: { type: GraphQLString },
+      },
+      // by this we create , create that edge to new user.
+      resolve(parentValue, { firstName , age }) {
+        return axios.post('http://localhost:3000/users', {
+          firstName, age
+        }).then(res => res.data);
+      }
+      //sample mutation
+      // mutation {
+      //   addUser(firstName: "robert", age: 26) {
+      //     id,
+      //     firstName,
+      //     age
+      //   }
+      // }
+    },
+    deleteUser: {
+      type: UserType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString)
+        }
+      }, 
+      resolve(parentValue, args){
+        return axios.delete(`http://localhost:3000/users/${args.id}`)
+          .then(res=> res.data);
+      }
+      // mutation {
+      //   deleteUser(id: "i7pybxW") {
+      //     id
+      //   }
+      // }
+    },
+    editUser: {
+      // remember resolve return would be UserType
+      type: UserType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString)
+        },
+        firstName: {
+          type: GraphQLString
+        },
+        age: {
+          type: GraphQLString
+        },
+        companyId: {
+          type: GraphQLString
+        }
+      },
+      resolve(parentValue,args) {
+        return axios.patch(`http://localhost:3000/users/${args.id}`, {
+          firstName: args.firstName
+        }).then(res => res.data);
+      }
+    }
+  }
+});
 
 module.exports = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation: mutation
 });
 
 
@@ -178,3 +262,4 @@ module.exports = new GraphQLSchema({
 // }
 //
 //
+
