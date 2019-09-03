@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
+// helper allow us to write query inside files.
+// only define query and mutation
 import gql from 'graphql-tag';
+// helper lib allows us binding info back from graphql to our comp.
+// play network request. play as wrapper.
+// data back of it come in props object.
 import { graphql } from 'react-apollo';
 import { Link } from 'react-router';
 
@@ -54,4 +59,3 @@ const mutation = gql`
 export default graphql(mutation)(
     graphql(query)(SongList)
 ); 
- 
