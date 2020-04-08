@@ -7,7 +7,8 @@ export default {
       id: uuid(),
       ...args.data,
     };
-    -users.push(user);
+    users.push(user);
+
     return user;
   },
   deleteUser(parentValue, args, ctx, info) {
@@ -31,6 +32,14 @@ export default {
       id: uuid(),
       ...args.data,
     };
+    if (args.data.published)
+      ctx.pubsub.publish("post", {
+        post: {
+          // inform listener type of mutation to use in ui
+          mutation: "CREATED",
+          data: post,
+        },
+      });
     posts.push(post);
     return post;
   },
@@ -45,6 +54,8 @@ export default {
       id: uuid(),
       ...args.data,
     };
+    // pattern : name of channel and info want to pass to channel
+    ctx.pubsub.publish(`comment ${args.data.post}`, { comment });
     comments.push(comment);
     return comment;
   },

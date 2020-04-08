@@ -31,6 +31,16 @@ type Comment {
   author: User!
 }
 
+type Subscription {
+  comment(postId: ID!): Comment!
+  post: PostSubscriptionPayload!
+}
+
+type PostSubscriptionPayload {
+  mutation: String!
+  data: Post!
+}
+
 type Mutation {
   createUser(data: CreateUserInput): User!
   deleteUser(id: ID!): User!
